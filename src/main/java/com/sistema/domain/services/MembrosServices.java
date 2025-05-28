@@ -1,0 +1,69 @@
+package com.sistema.domain.services;
+
+import com.sistema.domain.repositories.MembrosRepository;
+import com.sistema.infrastructure.exceptions.NotFoundException;
+import com.sistema.web.dto.Membros.MembroListDTO;
+import com.sistema.web.dto.Membros.MembrosResponseDTO;
+import com.sistema.web.dto.Membros.MembrosUpdateDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class MembrosServices {
+
+    private final MembrosRepository membrosRepository;
+
+    public MembrosServices(MembrosRepository membrosRepository) {
+        this.membrosRepository = membrosRepository;
+    }
+
+    public Page<MembrosResponseDTO> findAll(Pageable pageable) {
+        return membrosRepository.findAll(pageable)
+                .map(membro -> {
+                    MembrosResponseDTO dto = new MembrosResponseDTO();
+                    dto.setId(membro.getId());
+                    dto.setNome(membro.getNome());
+                    dto.setCpf(membro.getCpf());
+                    dto.setTelefone(membro.getTelefone());
+                    dto.setEmail(membro.getEmail());
+                    return dto;
+                });
+    }
+
+    public MembrosResponseDTO findById(Long id) {
+        return membrosRepository.findById(id)
+                .map(MembrosResponseDTO::converter)
+                .orElseThrow(() -> new NotFoundException("Membro não encontrado!"));
+    }
+
+    public void delete(Long id) {
+        if (!membrosRepository.existsById(id)) {
+            throw new NotFoundException("Membro não encontrado!");
+        }
+        membrosRepository.deleteById(id);
+    }
+
+    public MembrosResponseDTO update(MembrosUpdateDTO dto) {
+        var membro = membrosRepository.findById(dto.getId())
+                .orElseThrow(() -> new NotFoundException("Membro não encontrado!"));
+
+        membro.setNome(dto.getNome());
+        membro.setCpf(dto.getCpf());
+        membro.setTelefone(dto.getTelefone());
+        membro.setEmail(dto.getEmail());
+
+        var updatedMembro = membrosRepository.save(membro);
+        return MembrosResponseDTO.converter(updatedMembro);
+    }
+
+    public List<MembroListDTO> findAllList() {
+        return membrosRepository.findAll()
+                .stream()
+                .map(MembroListDTO::converter)
+                .collect(Collectors.toList());
+    }
+}

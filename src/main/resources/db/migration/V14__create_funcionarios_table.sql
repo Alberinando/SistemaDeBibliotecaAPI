@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS funcionarios (
+    id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome    VARCHAR(255)        NOT NULL,
+    cargo   VARCHAR(100)        NOT NULL,
+    login   VARCHAR(100)        NOT NULL UNIQUE,
+    senha   VARCHAR(255)        NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()
+);
