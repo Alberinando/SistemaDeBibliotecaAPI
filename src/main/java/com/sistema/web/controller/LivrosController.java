@@ -1,11 +1,14 @@
 package com.sistema.web.controller;
 
 import com.sistema.domain.services.LivrosServices;
+import com.sistema.web.dto.Livros.LivroCreateDTO;
 import com.sistema.web.dto.Livros.LivroListDTO;
 import com.sistema.web.dto.Livros.LivroResponseDTO;
 import com.sistema.web.dto.Livros.LivroUpdateDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +16,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/livros")
+@CrossOrigin("*")
+@Slf4j
 public class LivrosController {
     private final LivrosServices livrosServices;
 
@@ -50,4 +55,11 @@ public class LivrosController {
         livrosServices.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public LivroResponseDTO createLivro(@RequestBody LivroCreateDTO dto) {
+        return livrosServices.create(dto);
+    }
+
 }
