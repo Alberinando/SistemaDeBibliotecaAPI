@@ -32,6 +32,9 @@ public class Livros {
     @Column(nullable = false)
     private Long isbn;
 
+    @Column(nullable = false)
+    private Integer quantidade;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

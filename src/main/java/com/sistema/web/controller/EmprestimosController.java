@@ -5,6 +5,7 @@ import com.sistema.web.dto.Emprestimos.EmprestimoResponseDTO;
 import com.sistema.web.dto.Emprestimos.EmprestimoUpdateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class EmprestimosController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<EmprestimoResponseDTO>> getAllEmprestimos(Pageable pageable) {
+    public ResponseEntity<Page<EmprestimoResponseDTO>> getAllEmprestimos(@PageableDefault(page = 0, size = 10) Pageable pageable) {
         Page<EmprestimoResponseDTO> emprestimos = emprestimosServices.findAll(pageable);
         return ResponseEntity.ok(emprestimos);
     }

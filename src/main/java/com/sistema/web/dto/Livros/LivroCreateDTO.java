@@ -13,4 +13,5 @@ public class LivroCreateDTO {
     private String categoria;
     private Boolean disponibilidade;
     private Long isbn;
+    private Integer quantidade;
 }

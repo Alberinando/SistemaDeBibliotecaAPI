@@ -1,8 +1,10 @@
 package com.sistema.domain.services;
 
+import com.sistema.domain.entities.Membros;
 import com.sistema.domain.repositories.MembrosRepository;
 import com.sistema.infrastructure.exceptions.NotFoundException;
 import com.sistema.web.dto.Membros.MembroListDTO;
+import com.sistema.web.dto.Membros.MembrosCreateDTO;
 import com.sistema.web.dto.Membros.MembrosResponseDTO;
 import com.sistema.web.dto.Membros.MembrosUpdateDTO;
 import org.springframework.data.domain.Page;
@@ -66,4 +68,24 @@ public class MembrosServices {
                 .map(MembroListDTO::converter)
                 .collect(Collectors.toList());
     }
+
+    public MembrosResponseDTO create(MembrosCreateDTO dto) {
+        if (membrosRepository.existsByCpf(dto.getCpf())) {
+            throw new IllegalArgumentException("CPF já existe!");
+        }
+
+        if (membrosRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("Email já existe!");
+        }
+
+        Membros membro = new Membros();
+        membro.setNome(dto.getNome());
+        membro.setCpf(dto.getCpf());
+        membro.setTelefone(dto.getTelefone());
+        membro.setEmail(dto.getEmail());
+
+        Membros savedMembro = membrosRepository.save(membro);
+        return MembrosResponseDTO.converter(savedMembro);
+    }
+
 }

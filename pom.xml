@@ -10,9 +10,10 @@
 	</parent>
 	<groupId>com.sistema</groupId>
 	<artifactId>Sistema-de-biblioteca</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>api</version>
+	<packaging>war</packaging>
 	<name>Sistema-de-biblioteca</name>
-	<description>Sistema de empréstimos A3 </description>
+	<description>Sistema de empréstimos A3</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -61,6 +62,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

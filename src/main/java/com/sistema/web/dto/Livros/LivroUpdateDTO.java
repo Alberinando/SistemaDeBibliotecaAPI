@@ -13,4 +13,6 @@ public class LivroUpdateDTO {
     private String autor;
     private String categoria;
     private Boolean disponibilidade;
+    private Long isbn;
+    private Integer quantidade;
 }

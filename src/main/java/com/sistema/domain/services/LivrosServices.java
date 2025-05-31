@@ -69,6 +69,7 @@ public class LivrosServices {
         livro.setAutor(dto.getAutor());
         livro.setCategoria(dto.getCategoria());
         livro.setDisponibilidade(dto.getDisponibilidade());
+        livro.setQuantidade(dto.getQuantidade());
 
         var updatedLivro = livrosRepository.save(livro);
 
@@ -78,6 +79,7 @@ public class LivrosServices {
     public List<LivroListDTO> findAllList() {
         return livrosRepository.findAll()
                 .stream()
+                .filter(livro -> livro.getQuantidade() > 0)
                 .map(LivroListDTO::converter)
                 .collect(Collectors.toList());
     }
@@ -93,6 +95,7 @@ public class LivrosServices {
         livro.setCategoria(dto.getCategoria());
         livro.setDisponibilidade(dto.getDisponibilidade());
         livro.setIsbn(dto.getIsbn());
+        livro.setQuantidade(dto.getQuantidade());
 
         Livros savedLivro = livrosRepository.save(livro);
 

@@ -16,6 +16,7 @@ public class LivroResponseDTO {
     private String categoria;
     private Boolean disponibilidade;
     private Long isbn;
+    private Integer quantidade;
 
     public LivroResponseDTO(Livros Livros) {
         this.id = Livros.getId();
@@ -24,6 +25,7 @@ public class LivroResponseDTO {
         this.categoria = Livros.getCategoria();
         this.disponibilidade = Livros.getDisponibilidade();
         this.isbn = Livros.getIsbn();
+        this.quantidade = Livros.getQuantidade();
     }
 
     public static LivroResponseDTO converter(Livros Livros){
