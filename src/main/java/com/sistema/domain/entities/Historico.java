@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "historicoEmprestimos")
+@Table(name = "historicoemprestimos")
 public class Historico {
 
     @Id
@@ -18,20 +18,19 @@ public class Historico {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "livroId", nullable = false)
+    @JoinColumn(name = "livroid", nullable = false)
     private Livros livros;
 
     @ManyToOne
-    @JoinColumn(name = "idMembro", nullable = false)
+    @JoinColumn(name = "idmembro", nullable = false)
     private Membros membros;
 
-    @Column(nullable = false)
+    @Column(name = "dataacao", nullable = false)
     private LocalDateTime dataAcao = LocalDateTime.now();
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
-
 }

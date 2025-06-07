@@ -102,4 +102,9 @@ public class LivrosServices {
         return LivroResponseDTO.converter(savedLivro);
     }
 
+    public Livros findEntityById(Long id) {
+        return livrosRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Livro não encontrado com o ID: " + id));
+    }
+
 }

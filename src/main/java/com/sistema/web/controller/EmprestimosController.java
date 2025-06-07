@@ -1,16 +1,19 @@
 package com.sistema.web.controller;
 
 import com.sistema.domain.services.EmprestimosServices;
+import com.sistema.web.dto.Emprestimos.EmprestimoCreateDTO;
 import com.sistema.web.dto.Emprestimos.EmprestimoResponseDTO;
 import com.sistema.web.dto.Emprestimos.EmprestimoUpdateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/emprestimos")
+@CrossOrigin("*")
 public class EmprestimosController {
 
     private final EmprestimosServices emprestimosServices;
@@ -42,4 +45,11 @@ public class EmprestimosController {
         emprestimosServices.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping
+    public ResponseEntity<EmprestimoResponseDTO> createEmprestimo(@RequestBody EmprestimoCreateDTO dto) {
+        EmprestimoResponseDTO createdEmprestimo = emprestimosServices.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdEmprestimo);
+    }
+
 }

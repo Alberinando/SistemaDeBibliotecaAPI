@@ -42,6 +42,11 @@ public class MembrosServices {
                 .orElseThrow(() -> new NotFoundException("Membro não encontrado!"));
     }
 
+    public Membros findEntityById(Long id) {
+        return membrosRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Membro não encontrado com o ID: " + id));
+    }
+
     public void delete(Long id) {
         if (!membrosRepository.existsById(id)) {
             throw new NotFoundException("Membro não encontrado!");

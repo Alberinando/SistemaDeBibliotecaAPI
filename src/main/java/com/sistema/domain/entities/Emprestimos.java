@@ -18,16 +18,17 @@ public class Emprestimos {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "livroId", nullable = false)
+    @JoinColumn(name = "livroid", nullable = false)
     private Livros livro;
 
     @ManyToOne
-    @JoinColumn(name = "membroId", nullable = false)
+    @JoinColumn(name = "membroid", nullable = false)
     private Membros membro;
 
-    @Column(nullable = false)
+    @Column(name = "dataemprestimo", nullable = false)
     private LocalDateTime dataEmprestimo = LocalDateTime.now();
 
+    @Column(name = "datadevolucao")
     private LocalDateTime dataDevolucao;
 
     @Column(nullable = false, length = 20)
