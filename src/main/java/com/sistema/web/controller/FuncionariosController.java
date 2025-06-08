@@ -62,7 +62,7 @@ public class FuncionariosController {
 
     @PostMapping("/auth")
     public ResponseEntity aurhentication(@RequestBody CredentialsDTO credentialsDTO) {
-        var token = funcionariosServices.authenticate(credentialsDTO.getEmail(), credentialsDTO.getPassword());
+        var token = funcionariosServices.authenticate(credentialsDTO.getLogin(), credentialsDTO.getSenha());
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

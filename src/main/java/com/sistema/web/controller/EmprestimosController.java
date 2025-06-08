@@ -4,6 +4,7 @@ import com.sistema.domain.services.EmprestimosServices;
 import com.sistema.web.dto.Emprestimos.EmprestimoCreateDTO;
 import com.sistema.web.dto.Emprestimos.EmprestimoResponseDTO;
 import com.sistema.web.dto.Emprestimos.EmprestimoUpdateDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/emprestimos")
+@Slf4j
 @CrossOrigin("*")
 public class EmprestimosController {
 

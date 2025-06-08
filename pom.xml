@@ -11,7 +11,7 @@
 	<groupId>com.sistema</groupId>
 	<artifactId>Sistema-de-biblioteca</artifactId>
 	<version>api</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>Sistema-de-biblioteca</name>
 	<description>Sistema de empréstimos A3</description>
 	<url/>
