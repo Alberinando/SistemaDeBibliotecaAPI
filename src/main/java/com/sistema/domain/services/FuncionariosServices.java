@@ -102,7 +102,7 @@ public class FuncionariosServices {
     }
 
     private void encodePassword(FuncionarioCreateDTO funcionarioCreateDTO) {
-        String hashedPassword = passwordEncoder.encode(funcionarioCreateDTO.getLogin());
+        String hashedPassword = passwordEncoder.encode(funcionarioCreateDTO.getSenha());
         funcionarioCreateDTO.setSenha(hashedPassword);
     }
 }
