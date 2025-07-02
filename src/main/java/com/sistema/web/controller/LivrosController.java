@@ -8,6 +8,7 @@ import com.sistema.web.dto.Livros.LivroUpdateDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class LivrosController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<LivroResponseDTO>> getAllLivros(@PageableDefault(page = 0, size = 10) Pageable pageable) {
+    public ResponseEntity<Page<LivroResponseDTO>> getAllLivros(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<LivroResponseDTO> livros = livrosServices.findAll(pageable);
         return ResponseEntity.ok(livros);
     }

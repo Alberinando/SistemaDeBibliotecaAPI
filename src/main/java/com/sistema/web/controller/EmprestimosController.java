@@ -7,6 +7,7 @@ import com.sistema.web.dto.Emprestimos.EmprestimoUpdateDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class EmprestimosController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<EmprestimoResponseDTO>> getAllEmprestimos(@PageableDefault(page = 0, size = 10) Pageable pageable) {
+    public ResponseEntity<Page<EmprestimoResponseDTO>> getAllEmprestimos(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<EmprestimoResponseDTO> emprestimos = emprestimosServices.findAll(pageable);
         return ResponseEntity.ok(emprestimos);
     }

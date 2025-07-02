@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,10 +59,24 @@ public class MembrosServices {
         var membro = membrosRepository.findById(dto.getId())
                 .orElseThrow(() -> new NotFoundException("Membro não encontrado!"));
 
+        if (membrosRepository.existsByCpf(dto.getCpf())) {
+            throw new IllegalArgumentException("CPF já existe!");
+        }
+
+        if (membrosRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("Email já existe!");
+        }
+
+        if(!Objects.equals(membro.getCpf(), dto.getCpf())) {
+            membro.setCpf(dto.getCpf());
+        }
+
+        if(!Objects.equals(membro.getEmail(), dto.getEmail())) {
+            membro.setEmail(dto.getEmail());
+        }
+
         membro.setNome(dto.getNome());
-        membro.setCpf(dto.getCpf());
         membro.setTelefone(dto.getTelefone());
-        membro.setEmail(dto.getEmail());
 
         var updatedMembro = membrosRepository.save(membro);
         return MembrosResponseDTO.converter(updatedMembro);

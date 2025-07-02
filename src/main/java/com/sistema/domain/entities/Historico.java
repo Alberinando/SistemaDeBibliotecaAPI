@@ -17,6 +17,9 @@ public class Historico {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "emprestimoid", nullable = false)
+    private Long emprestimoId;
+
     @ManyToOne
     @JoinColumn(name = "livroid", nullable = false)
     private Livros livros;
