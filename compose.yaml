@@ -4,11 +4,24 @@ services:
   postgres:
     image: 'postgres:latest'
     environment:
-      POSTGRES_DB: sistemaDB
+      POSTGRES_DB: sistemaBibliotecaDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
     ports:
-      - '5432:5432'
+      - '5438:5432'
+    networks:
+      - sistema-net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+    ports:
+      - '15432:80'
+    depends_on:
+      - postgres
     networks:
       - sistema-net
 
