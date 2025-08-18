@@ -2,13 +2,15 @@ version: '3.8'
 
 services:
   postgres:
-    image: 'postgres:latest'
+    image: postgres:latest
     environment:
       POSTGRES_DB: sistemaBibliotecaDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
     ports:
       - '5438:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - sistema-net
 
@@ -16,14 +18,32 @@ services:
     image: dpage/pgadmin4
     restart: always
     environment:
-      PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - '15432:80'
     depends_on:
       - postgres
     networks:
       - sistema-net
+
+  sbootapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+    restart: on-failure
+    depends_on:
+      - postgres
+    ports:
+      - '8088:8088'
+    environment:
+      POSTGRES_HOST: postgres
+    networks:
+      - sistema-net
+
+volumes:
+  postgres-data:
 
 networks:
   sistema-net:
