@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:15
     environment:
       POSTGRES_DB: sistemaBibliotecaDB
       POSTGRES_USER: postgres
@@ -13,6 +13,11 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - sistema-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-sistemaBibliotecaDB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   pgadmin:
     image: dpage/pgadmin4
@@ -39,6 +44,11 @@ services:
       - '8088:8088'
     environment:
       POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: sistemaBibliotecaDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      SERVER_PORT: 8088
     networks:
       - sistema-net
 
