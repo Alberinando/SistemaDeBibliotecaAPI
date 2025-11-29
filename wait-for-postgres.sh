@@ -1,33 +1,36 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# wait-for-postgres.sh
+# Espera até o Postgres estar pronto (usa pg_isready). Timeout em segundos via TIMEOUT.
 set -e
 
-: "${SPRING_DATASOURCE_HOST:=postgres}"
-: "${SPRING_DATASOURCE_PORT:=5432}"
-: "${SPRING_DATASOURCE_URL:=${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}}"
+: "${TIMEOUT:=60}"
 : "${SPRING_DATASOURCE_USERNAME:=postgres}"
+: "${SPRING_DATASOURCE_PASSWORD:=postgres}"
 
-# Extra: permitir que o usuário sobreponha criando SPRING_DATASOURCE_HOST/PORT no compose/env
-HOST=${SPRING_DATASOURCE_HOST}
-PORT=${SPRING_DATASOURCE_PORT}
-USER=${SPRING_DATASOURCE_USERNAME}
+# Se passar SPRING_DATASOURCE_URL em formato JDBC, tenta extrair host/port/name
+if [ -n "${SPRING_DATASOURCE_URL}" ]; then
+  # Ex.: jdbc:postgresql://host:5432/dbname?params...
+  # extrai host, port e db simples
+  DB_HOST=$(echo "$SPRING_DATASOURCE_URL" | sed -n 's#jdbc:postgresql://\([^:/?]*\).*#\1#p')
+  DB_PORT=$(echo "$SPRING_DATASOURCE_URL" | sed -n 's#jdbc:postgresql://[^:/?]*:\([0-9]*\).*#\1#p')
+  DB_NAME=$(echo "$SPRING_DATASOURCE_URL" | sed -n 's#jdbc:postgresql://[^/]*/\([^?]*\).*#\1#p')
+fi
 
-echo "=> Waiting for Postgres at ${HOST}:${PORT} ..."
+: "${DB_HOST:=localhost}"
+: "${DB_PORT:=5432}"
+: "${DB_NAME:=postgres}"
 
-# Tenta psql (pg_isready é o método mais robusto)
-# Se houver senha, pg_isready ainda checa conexão TCP; se acesso precisar de auth, ainda assim OK para disponibilidade.
-RETRIES=0
-MAX_RETRIES=60
-SLEEP_SECONDS=1
+echo "Aguardando Postgres em ${DB_HOST}:${DB_PORT} (db=${DB_NAME}) por até ${TIMEOUT}s..."
 
-while ! pg_isready -h "${HOST}" -p "${PORT}" >/dev/null 2>&1; do
-  RETRIES=$((RETRIES+1))
-  if [ "$RETRIES" -ge "$MAX_RETRIES" ]; then
-    echo "=> Postgres did not become ready in time (${MAX_RETRIES}s). Exiting."
+elapsed=0
+while ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$SPRING_DATASOURCE_USERNAME" >/dev/null 2>&1; do
+  if [ "$elapsed" -ge "$TIMEOUT" ]; then
+    echo "Timeout: Postgres não ficou pronto após ${TIMEOUT}s"
     exit 1
   fi
-  printf '.'
-  sleep "${SLEEP_SECONDS}"
+  sleep 2
+  elapsed=$((elapsed+2))
 done
 
-echo
-echo "=> Postgres is available. Continuing start."
+echo "Postgres pronto. Prosseguindo."
+exec "$@"
