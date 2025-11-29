@@ -1,54 +1,34 @@
-version: '3.8'
-
+version: "3.8"
 services:
-  postgres:
-    image: postgres:15-alpine
+  db:
+    image: postgres:17
     environment:
-      POSTGRES_DB: sistemaBibliotecaDB
-      POSTGRES_USER: postgres
-      # Ler a senha do secret/variável de ambiente do host (NÃO commitar)
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: sistema
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d sistemaBibliotecaDB || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - sistema-net
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
-  sbootapp:
-    # Em produção é preferível apontar para uma imagem (registry) com tag imutável.
-    # Para desenvolvimento local, você pode manter 'build:'.
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: unless-stopped
+  app:
+    build: .
+    environment:
+      PORT: 8088
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/sistema
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: secret
+      JWT_SECRET: changeme
+      APP_ALLOWED_ORIGINS: http://localhost:3000
     depends_on:
-      - postgres
+      - db
     ports:
       - "8088:8088"
-    environment:
-      SPRING_PROFILES_ACTIVE: "prod"
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/sistemaBibliotecaDB"
-      SPRING_DATASOURCE_USERNAME: "postgres"
-      # Use a mesma senha do postgres container (mas não commite)
-      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD}"
-      DB_MAX_POOL_SIZE: "10"
-      DB_MIN_IDLE: "2"
-      # JWT e allowed origins devem ser passados via env no provedor (Coolify)
-      JWT_SECRET: "${JWT_SECRET}"
-      APP_ALLOWED_ORIGINS: "${APP_ALLOWED_ORIGINS:-https://sistemabiblioteca.alberinando.com}"
-      # JVM tune (overrideable no Coolify)
-      JAVA_OPTS: "${JAVA_OPTS:- -Xms256m -Xmx512m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError}"
-    networks:
-      - sistema-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 volumes:
-  postgres-data:
-    name: postgres-data
-
-networks:
-  sistema-net:
-    driver: bridge
+  db-data:
