@@ -41,8 +41,4 @@ RUN chmod +x /app/wait-for-postgres.sh
 ENV JAVA_OPTS=""
 EXPOSE 8088
 
-# Healthcheck (usa actuator)
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:8088/actuator/health || exit 1
-
 ENTRYPOINT ["/bin/sh", "-c", "/app/wait-for-postgres.sh && exec java $JAVA_OPTS -jar /app/app.jar"]
