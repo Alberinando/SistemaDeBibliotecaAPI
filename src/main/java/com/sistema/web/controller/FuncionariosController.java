@@ -20,7 +20,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/v1/funcionario")
 @RequiredArgsConstructor
-@CrossOrigin("*")
 @Slf4j
 public class FuncionariosController {
 

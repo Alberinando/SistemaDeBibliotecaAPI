@@ -3,9 +3,12 @@ package com.sistema.infrastructure.security.Jwt;
 import com.sistema.domain.entities.Funcionarios;
 import com.sistema.infrastructure.config.AccessToken;
 import com.sistema.infrastructure.exceptions.InvalidTokenException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -21,8 +24,17 @@ public class Jwt {
 
     private final SecretKeyGenerator secretKeyGenerator;
 
+    @Value("${jwt.expiration-minutes:60}")
+    private long expirationMinutes;
+
+    @Value("${jwt.issuer:sistema-biblioteca-api}")
+    private String issuer;
+
+    @Value("${jwt.audience:frontend-oficial}")
+    private String audience;
+
     private Date getExpiration() {
-        LocalDateTime now = LocalDateTime.now().plusMinutes(60);
+        LocalDateTime now = LocalDateTime.now().plusMinutes(expirationMinutes);
         return Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
     }
 
@@ -35,27 +47,35 @@ public class Jwt {
     public AccessToken getAccessToken(Funcionarios funcionario) {
         SecretKey secretKey = secretKeyGenerator.getSecretKey();
         Date expiration = getExpiration();
+
         String token = Jwts.builder()
+                .setIssuer(issuer)
+                .setAudience(audience)
                 .setSubject(funcionario.getLogin())
                 .setExpiration(expiration)
+                .setIssuedAt(new Date())
                 .addClaims(generateTokenClaims(funcionario))
-                .signWith(secretKey)
+                .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
+
         return new AccessToken(token);
     }
 
     public String getLoginFromToken(String token) {
-        try{
+        try {
             SecretKey secretKey = secretKeyGenerator.getSecretKey();
 
             var jws = Jwts.parserBuilder()
+                    .requireIssuer(issuer)
+                    .requireAudience(audience)
                     .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(token);
 
-            return jws.getBody().getSubject();
+            Claims body = jws.getBody();
+            return body.getSubject();
         } catch (JwtException e) {
-            throw new InvalidTokenException(e.getMessage());
+            throw new InvalidTokenException("Token inválido ou expirado");
         }
     }
 }

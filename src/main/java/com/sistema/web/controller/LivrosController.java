@@ -18,7 +18,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/livros")
-@CrossOrigin("*")
 @Slf4j
 public class LivrosController {
     private final LivrosServices livrosServices;

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/historico")
-@CrossOrigin(origins = "*")
 public class HistoricoController {
 
     private final HistoricoServices historicoServices;

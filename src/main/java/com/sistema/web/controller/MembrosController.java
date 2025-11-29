@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/membros")
-@CrossOrigin("*")
 public class MembrosController {
 
     private final MembrosServices membrosServices;

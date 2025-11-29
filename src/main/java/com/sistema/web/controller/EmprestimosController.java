@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/emprestimos")
 @Slf4j
-@CrossOrigin("*")
 public class EmprestimosController {
 
     private final EmprestimosServices emprestimosServices;

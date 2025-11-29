@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.sistema</groupId>
 	<artifactId>Sistema-de-biblioteca</artifactId>
-	<version>api</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 	<name>Sistema-de-biblioteca</name>
 	<description>Sistema de empréstimos A3</description>
@@ -87,7 +87,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
