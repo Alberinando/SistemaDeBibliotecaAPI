@@ -43,14 +43,14 @@ public class Security {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorizeRequests -> 
-                    authorizeRequests
-                        .requestMatchers("/v1/funcionario/auth").permitAll()
-                        .requestMatchers("/", "/index.html", "/favicon.ico").permitAll()
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(authorizeRequests -> {
+                    authorizeRequests.requestMatchers("/", "/index.html", "/favicon.ico").permitAll();
+                    authorizeRequests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                    authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/auth").permitAll();
+                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
+                    authorizeRequests.requestMatchers("/actuator/health", "/actuator/info").permitAll();
+                    authorizeRequests.anyRequest().authenticated();
+                })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
