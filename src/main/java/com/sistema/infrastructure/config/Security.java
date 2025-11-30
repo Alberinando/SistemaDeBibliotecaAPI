@@ -38,16 +38,23 @@ public class Security {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
+//        return http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .cors(Customizer.withDefaults())
+//                .authorizeHttpRequests(authorizeRequests -> {
+//                    authorizeRequests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+//                    authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/auth").permitAll();
+//                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
+//                    authorizeRequests.requestMatchers(HttpMethod.GET, "/").permitAll();
+//                    authorizeRequests.anyRequest().authenticated();
+//                })
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+//                .build();
+
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(authorizeRequests -> {
-                    authorizeRequests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
-                    authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/auth").permitAll();
-                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
-                    authorizeRequests.requestMatchers(HttpMethod.GET, "/").permitAll();
-                    authorizeRequests.anyRequest().authenticated();
-                })
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
