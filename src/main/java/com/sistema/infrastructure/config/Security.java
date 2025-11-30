@@ -43,6 +43,9 @@ public class Security {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorizeRequests -> {
                     authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/auth").permitAll();
+                    authorizeRequests.requestMatchers("/actuator/**").permitAll();
+                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
+                    authorizeRequests.requestMatchers(HttpMethod.GET, "/").permitAll();
                     authorizeRequests.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
