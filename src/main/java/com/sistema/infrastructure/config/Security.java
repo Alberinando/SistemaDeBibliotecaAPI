@@ -11,6 +11,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -38,23 +39,17 @@ public class Security {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
-//        return http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .cors(Customizer.withDefaults())
-//                .authorizeHttpRequests(authorizeRequests -> {
-//                    authorizeRequests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
-//                    authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/auth").permitAll();
-//                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
-//                    authorizeRequests.requestMatchers(HttpMethod.GET, "/").permitAll();
-//                    authorizeRequests.anyRequest().authenticated();
-//                })
-//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-//                .build();
-
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorizeRequests -> {
+                    authorizeRequests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                    authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/auth").permitAll();
+                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/").permitAll();
+                    authorizeRequests.requestMatchers(HttpMethod.GET, "/").permitAll();
+                    authorizeRequests.anyRequest().authenticated();
+                })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

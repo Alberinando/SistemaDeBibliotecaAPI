@@ -28,20 +28,37 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorization = getToken(request);
-        if (authorization != null) {
-            try {
-                String login = jwt.getLoginFromToken(authorization);
-                Funcionarios funcionarios = funcionariosServices.findUserByLogin(login);
-                setUserAsAuthenticated(funcionarios);
-            } catch (InvalidTokenException e) {
-                log.error("Token inválido: {}",e.getMessage());
-                throw new InvalidTokenException(e.getMessage());
-            } catch (Exception e){
-                log.error("Erro na validação do token: {}",e.getMessage());
-                throw new InvalidTokenException(e.getMessage());
-            }
+
+        if (authorization == null) {
+            log.debug("JwtFilter: nenhum Authorization header encontrado para {}", request.getRequestURI());
+            filterChain.doFilter(request, response);
+            return;
         }
-        filterChain.doFilter(request, response);
+
+        try {
+            String login = jwt.getLoginFromToken(authorization);
+            if (login == null) {
+                log.warn("JwtFilter: token sem login");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
+                return;
+            }
+
+            Funcionarios funcionarios = funcionariosServices.findUserByLogin(login);
+            if (funcionarios == null) {
+                log.warn("JwtFilter: usuário não encontrado para login do token: {}", login);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuário do token não encontrado");
+                return;
+            }
+
+            setUserAsAuthenticated(funcionarios);
+            filterChain.doFilter(request, response);
+        } catch (InvalidTokenException e) {
+            log.warn("JwtFilter: token inválido - {}", e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
+        } catch (Exception e) {
+            log.error("JwtFilter: erro ao validar token", e);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Erro ao validar token");
+        }
     }
 
     private void setUserAsAuthenticated(Funcionarios funcionarios) {
