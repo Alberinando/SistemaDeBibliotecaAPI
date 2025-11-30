@@ -44,10 +44,11 @@ public class Security {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> {
+                    authorizeRequests.requestMatchers("/", "/index.html", "/favicon.ico").permitAll();
                     authorizeRequests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/auth").permitAll();
-                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/").permitAll();
-                    authorizeRequests.requestMatchers(HttpMethod.GET, "/").permitAll();
+                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
+                    authorizeRequests.requestMatchers("/actuator/health", "/actuator/info").permitAll();
                     authorizeRequests.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -63,16 +64,11 @@ public class Security {
                 .toList();
 
         CorsConfiguration config = new CorsConfiguration();
-        try {
-            config.setAllowedOriginPatterns(allowedOrigins);
-        } catch (NoSuchMethodError | UnsupportedOperationException ignore) {
-            config.setAllowedOrigins(allowedOrigins);
-        }
-
+        config.setAllowedOriginPatterns(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With", "Origin"));
+        config.setAllowedHeaders(Arrays.asList("*"));
         config.setExposedHeaders(Arrays.asList("Authorization"));
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(false);
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
