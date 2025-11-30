@@ -42,8 +42,8 @@ public class Security {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorizeRequests -> {
+                    authorizeRequests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/auth").permitAll();
-                    authorizeRequests.requestMatchers("/actuator/**").permitAll();
                     authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
                     authorizeRequests.requestMatchers(HttpMethod.GET, "/").permitAll();
                     authorizeRequests.anyRequest().authenticated();
@@ -61,9 +61,14 @@ public class Security {
                 .toList();
 
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(allowedOrigins);
+        try {
+            config.setAllowedOriginPatterns(allowedOrigins);
+        } catch (NoSuchMethodError | UnsupportedOperationException ignore) {
+            config.setAllowedOrigins(allowedOrigins);
+        }
+
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With", "Origin"));
         config.setExposedHeaders(Arrays.asList("Authorization"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
