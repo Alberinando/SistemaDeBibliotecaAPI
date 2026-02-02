@@ -1,12 +1,13 @@
 package com.sistema.domain.services;
 
 import com.sistema.domain.entities.Funcionarios;
-import com.sistema.domain.entities.Membros;
+import com.sistema.domain.entities.RefreshToken;
 import com.sistema.domain.repositories.FuncionariosRepository;
 import com.sistema.infrastructure.config.AccessToken;
 import com.sistema.infrastructure.exceptions.DuplicatedTupleException;
 import com.sistema.infrastructure.exceptions.NotFoundException;
 import com.sistema.infrastructure.security.Jwt.Jwt;
+import com.sistema.web.dto.AuthResponseDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioCreateDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioResponseDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioUpdateDTO;
@@ -25,7 +26,8 @@ public class FuncionariosServices {
 
     private final PasswordEncoder passwordEncoder;
     private final FuncionariosRepository funcionariosRepository;
-    private final Jwt token;
+    private final Jwt jwt;
+    private final RefreshTokenService refreshTokenService;
 
     public Page<FuncionarioResponseDTO> findAll(Pageable pageable) {
         return funcionariosRepository.findAll(pageable)
@@ -39,7 +41,7 @@ public class FuncionariosServices {
                 });
     }
 
-    public FuncionarioResponseDTO findById(Long id){
+    public FuncionarioResponseDTO findById(Long id) {
         return funcionariosRepository.findById(id)
                 .map(FuncionarioResponseDTO::converter)
                 .orElseThrow(() -> new NotFoundException("Funcionário não encontrado"));
@@ -64,7 +66,8 @@ public class FuncionariosServices {
         return FuncionarioResponseDTO.converter(updatedFuncionario);
     }
 
-    public AccessToken authenticate(String login, String senha) {
+    @Transactional
+    public AuthResponseDTO authenticate(String login, String senha) {
         var funcionario = funcionariosRepository.findByLogin(login);
         if (funcionario == null) {
             return null;
@@ -73,10 +76,43 @@ public class FuncionariosServices {
         boolean matches = passwordEncoder.matches(senha, funcionario.getSenha());
 
         if (matches) {
-            return token.getAccessToken(funcionario);
+            AccessToken accessToken = jwt.getAccessToken(funcionario);
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(funcionario);
+
+            return AuthResponseDTO.of(
+                    accessToken.getAccessToken(),
+                    refreshToken.getToken(),
+                    jwt.getExpirationInSeconds());
         }
 
         return null;
+    }
+
+    /**
+     * Renova o access token usando um refresh token válido.
+     */
+    @Transactional
+    public AuthResponseDTO refreshAccessToken(String refreshTokenStr) {
+        RefreshToken refreshToken = refreshTokenService.validateRefreshToken(refreshTokenStr);
+        Funcionarios funcionario = refreshToken.getFuncionario();
+
+        // Rotaciona o refresh token (gera um novo)
+        RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(refreshToken);
+
+        // Gera novo access token
+        AccessToken accessToken = jwt.getAccessToken(funcionario);
+
+        return AuthResponseDTO.of(
+                accessToken.getAccessToken(),
+                newRefreshToken.getToken(),
+                jwt.getExpirationInSeconds());
+    }
+
+    /**
+     * Revoga o refresh token (logout).
+     */
+    public void logout(String refreshToken) {
+        refreshTokenService.revokeToken(refreshToken);
     }
 
     public Funcionarios findUserByLogin(String login) {

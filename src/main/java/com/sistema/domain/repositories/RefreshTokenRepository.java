@@ -1,0 +1,24 @@
+package com.sistema.domain.repositories;
+
+import com.sistema.domain.entities.RefreshToken;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
+
+    Optional<RefreshToken> findByToken(String token);
+
+    @Modifying
+    @Query("UPDATE RefreshToken rt SET rt.revoked = true WHERE rt.funcionario.id = :funcionarioId AND rt.revoked = false")
+    void revokeAllByFuncionarioId(@Param("funcionarioId") Long funcionarioId);
+
+    @Modifying
+    @Query("DELETE FROM RefreshToken rt WHERE rt.expiresAt < CURRENT_TIMESTAMP")
+    void deleteAllExpired();
+}

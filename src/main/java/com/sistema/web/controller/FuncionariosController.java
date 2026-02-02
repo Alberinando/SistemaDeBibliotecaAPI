@@ -1,7 +1,10 @@
 package com.sistema.web.controller;
 
 import com.sistema.domain.services.FuncionariosServices;
+import com.sistema.infrastructure.exceptions.InvalidTokenException;
+import com.sistema.web.dto.AuthResponseDTO;
 import com.sistema.web.dto.CredentialsDTO;
+import com.sistema.web.dto.RefreshTokenRequestDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioCreateDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioResponseDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioUpdateDTO;
@@ -26,7 +29,8 @@ public class FuncionariosController {
     private final FuncionariosServices funcionariosServices;
 
     @GetMapping
-    public ResponseEntity<Page<FuncionarioResponseDTO>> getAllFuncionarios(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public ResponseEntity<Page<FuncionarioResponseDTO>> getAllFuncionarios(
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<FuncionarioResponseDTO> funcionarios = funcionariosServices.findAll(pageable);
         return ResponseEntity.ok(funcionarios);
     }
@@ -61,11 +65,28 @@ public class FuncionariosController {
     }
 
     @PostMapping("/auth")
-    public ResponseEntity aurhentication(@RequestBody CredentialsDTO credentialsDTO) {
-        var token = funcionariosServices.authenticate(credentialsDTO.getLogin(), credentialsDTO.getSenha());
-        if (token == null) {
+    public ResponseEntity<AuthResponseDTO> authentication(@RequestBody CredentialsDTO credentialsDTO) {
+        var authResponse = funcionariosServices.authenticate(credentialsDTO.getLogin(), credentialsDTO.getSenha());
+        if (authResponse == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok().body(token);
+        return ResponseEntity.ok(authResponse);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponseDTO> refreshToken(@RequestBody RefreshTokenRequestDTO request) {
+        try {
+            var authResponse = funcionariosServices.refreshAccessToken(request.getRefreshToken());
+            return ResponseEntity.ok(authResponse);
+        } catch (InvalidTokenException e) {
+            log.warn("Tentativa de refresh com token inválido: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody RefreshTokenRequestDTO request) {
+        funcionariosServices.logout(request.getRefreshToken());
+        return ResponseEntity.noContent().build();
     }
 }

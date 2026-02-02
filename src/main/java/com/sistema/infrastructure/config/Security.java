@@ -47,7 +47,10 @@ public class Security {
                     authorizeRequests.requestMatchers("/", "/index.html", "/favicon.ico").permitAll();
                     authorizeRequests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/auth").permitAll();
-                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
+                    authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/refresh").permitAll();
+                    authorizeRequests.requestMatchers(HttpMethod.POST, "/v1/funcionario/logout").permitAll();
+                    authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                            .permitAll();
                     authorizeRequests.requestMatchers("/actuator/health", "/actuator/info").permitAll();
                     authorizeRequests.anyRequest().authenticated();
                 })

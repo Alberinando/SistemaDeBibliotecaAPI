@@ -24,7 +24,7 @@ public class Jwt {
 
     private final SecretKeyGenerator secretKeyGenerator;
 
-    @Value("${jwt.expiration-minutes:60}")
+    @Value("${jwt.expiration-minutes:15}")
     private long expirationMinutes;
 
     @Value("${jwt.issuer:sistema-biblioteca-api}")
@@ -36,6 +36,13 @@ public class Jwt {
     private Date getExpiration() {
         LocalDateTime now = LocalDateTime.now().plusMinutes(expirationMinutes);
         return Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * Retorna o tempo de expiração do token em segundos.
+     */
+    public long getExpirationInSeconds() {
+        return expirationMinutes * 60;
     }
 
     private Map<String, Object> generateTokenClaims(Funcionarios funcionario) {
