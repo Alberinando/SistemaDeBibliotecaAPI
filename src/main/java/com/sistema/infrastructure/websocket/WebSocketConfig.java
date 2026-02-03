@@ -38,12 +38,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         String[] origins = allowedOrigins.split(",");
 
         // Endpoint para conexão via SockJS
+        // Usar setAllowedOriginPatterns em vez de setAllowedOrigins para
+        // compatibilidade
+        // com allowCredentials=true (necessário para cookies/autenticação)
         registry.addEndpoint("/ws-notificacoes")
-                .setAllowedOrigins(origins)
+                .setAllowedOriginPatterns(origins)
                 .withSockJS();
 
         // Endpoint para WebSocket nativo (opcional, para clientes que suportam)
         registry.addEndpoint("/ws-notificacoes")
-                .setAllowedOrigins(origins);
+                .setAllowedOriginPatterns(origins);
     }
 }
