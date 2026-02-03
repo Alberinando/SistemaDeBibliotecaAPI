@@ -52,6 +52,9 @@ public class Security {
                     authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                             .permitAll();
                     authorizeRequests.requestMatchers("/actuator/health", "/actuator/info").permitAll();
+                    // WebSocket endpoints - permitir conexão inicial (autenticação via STOMP
+                    // headers)
+                    authorizeRequests.requestMatchers("/ws-notificacoes/**").permitAll();
                     authorizeRequests.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

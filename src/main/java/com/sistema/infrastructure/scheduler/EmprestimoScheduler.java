@@ -6,7 +6,7 @@ import com.sistema.domain.repositories.EmprestimosRepository;
 import com.sistema.domain.repositories.FuncionariosRepository;
 import com.sistema.domain.repositories.LivrosRepository;
 import com.sistema.domain.services.NotificacaoService;
-import com.sistema.infrastructure.websocket.NotificacaoWebSocketHandler;
+import com.sistema.infrastructure.websocket.NotificacaoWebSocketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +25,7 @@ public class EmprestimoScheduler {
     private final FuncionariosRepository funcionariosRepository;
     private final LivrosRepository livrosRepository;
     private final NotificacaoService notificacaoService;
-    private final NotificacaoWebSocketHandler webSocketHandler;
+    private final NotificacaoWebSocketService webSocketService;
 
     /**
      * Job executado todos os dias à meia-noite
@@ -71,7 +71,7 @@ public class EmprestimoScheduler {
                                 " - Membro: " + emprestimo.getMembro().getNome());
 
                 // Envia via WebSocket
-                webSocketHandler.enviarNotificacao(funcionario.getId(),
+                webSocketService.enviarNotificacao(funcionario.getId(),
                         "Empréstimo vencido aguardando ação: " + emprestimo.getLivro().getTitulo());
             }
         }

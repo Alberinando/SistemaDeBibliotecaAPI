@@ -34,6 +34,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 path.equals("/") ||
                 path.equals("/index.html") ||
                 path.equals("/favicon.ico") ||
+                path.startsWith("/ws-notificacoes") ||
                 path.startsWith("/actuator/");
     }
 
