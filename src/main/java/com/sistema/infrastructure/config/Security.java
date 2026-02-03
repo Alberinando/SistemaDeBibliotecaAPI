@@ -70,11 +70,14 @@ public class Security {
                 .toList();
 
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(Arrays.asList("*"));
+        // Usar origens explícitas (não wildcard) porque allowCredentials é true
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setExposedHeaders(Arrays.asList("Authorization"));
-        config.setAllowCredentials(false);
+        // IMPORTANTE: deve ser true para requisições com credentials (cookies, auth
+        // headers)
+        config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
