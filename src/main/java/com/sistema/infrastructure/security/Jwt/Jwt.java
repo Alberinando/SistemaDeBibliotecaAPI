@@ -47,6 +47,7 @@ public class Jwt {
 
     private Map<String, Object> generateTokenClaims(Funcionarios funcionario) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("id", funcionario.getId());
         claims.put("name", funcionario.getNome());
         return claims;
     }
