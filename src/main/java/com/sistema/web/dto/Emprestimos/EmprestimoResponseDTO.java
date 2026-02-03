@@ -18,17 +18,19 @@ public class EmprestimoResponseDTO {
     private LocalDateTime dataEmprestimo;
     private LocalDateTime dataDevolucao;
     private Boolean status;
+    private Integer quantidade;
 
-    public EmprestimoResponseDTO(Emprestimos emprestimo){
+    public EmprestimoResponseDTO(Emprestimos emprestimo) {
         this.id = emprestimo.getId();
         this.livros = emprestimo.getLivro();
         this.membros = emprestimo.getMembro();
         this.dataEmprestimo = emprestimo.getDataEmprestimo();
         this.dataDevolucao = emprestimo.getDataDevolucao();
         this.status = emprestimo.getStatus();
+        this.quantidade = emprestimo.getQuantidade();
     }
 
-    public static EmprestimoResponseDTO converter(Emprestimos emprestimo){
+    public static EmprestimoResponseDTO converter(Emprestimos emprestimo) {
         return new EmprestimoResponseDTO(emprestimo);
     }
 }

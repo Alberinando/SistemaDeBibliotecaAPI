@@ -25,7 +25,8 @@ public class EmprestimosController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<EmprestimoResponseDTO>> getAllEmprestimos(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public ResponseEntity<Page<EmprestimoResponseDTO>> getAllEmprestimos(
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<EmprestimoResponseDTO> emprestimos = emprestimosServices.findAll(pageable);
         return ResponseEntity.ok(emprestimos);
     }
@@ -34,6 +35,13 @@ public class EmprestimosController {
     public ResponseEntity<EmprestimoResponseDTO> getEmprestimoById(@PathVariable Long id) {
         EmprestimoResponseDTO emprestimo = emprestimosServices.findById(id);
         return ResponseEntity.ok(emprestimo);
+    }
+
+    @GetMapping("/membro/{membroId}")
+    public ResponseEntity<Page<EmprestimoResponseDTO>> getHistoricoByMembroId(
+            @PathVariable Long membroId,
+            @PageableDefault(page = 0, size = 10, sort = "dataEmprestimo", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(emprestimosServices.findByMembroId(membroId, pageable));
     }
 
     @PutMapping

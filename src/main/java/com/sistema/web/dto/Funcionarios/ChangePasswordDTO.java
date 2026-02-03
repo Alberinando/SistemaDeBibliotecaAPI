@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FuncionarioUpdateDTO {
-    private Long id;
-    private String nome;
-    private String cargo;
-    private String login;
-    private Boolean notificacaoAutomatica;
+public class ChangePasswordDTO {
+    private String senhaAtual;
+    private String novaSenha;
 }

@@ -18,4 +18,5 @@ public class EmprestimoCreateDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private LocalDateTime dataDevolucao;
     private Boolean status;
+    private Integer quantidade = 1;
 }

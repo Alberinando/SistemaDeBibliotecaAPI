@@ -31,9 +31,15 @@ public class Funcionarios {
     @Column(nullable = false, length = 255)
     private String senha;
 
+    @Builder.Default
+    @Column(name = "notificacao_automatica", nullable = false)
+    private Boolean notificacaoAutomatica = true;
+
+    @Builder.Default
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Builder.Default
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 

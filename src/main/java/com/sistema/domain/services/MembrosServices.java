@@ -59,19 +59,19 @@ public class MembrosServices {
         var membro = membrosRepository.findById(dto.getId())
                 .orElseThrow(() -> new NotFoundException("Membro não encontrado!"));
 
-        if (membrosRepository.existsByCpf(dto.getCpf())) {
-            throw new IllegalArgumentException("CPF já existe!");
-        }
-
-        if (membrosRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email já existe!");
-        }
-
-        if(!Objects.equals(membro.getCpf(), dto.getCpf())) {
+        // Verifica CPF apenas se mudou
+        if (!Objects.equals(membro.getCpf(), dto.getCpf())) {
+            if (membrosRepository.existsByCpf(dto.getCpf())) {
+                throw new IllegalArgumentException("CPF já existe!");
+            }
             membro.setCpf(dto.getCpf());
         }
 
-        if(!Objects.equals(membro.getEmail(), dto.getEmail())) {
+        // Verifica Email apenas se mudou
+        if (!Objects.equals(membro.getEmail(), dto.getEmail())) {
+            if (membrosRepository.existsByEmail(dto.getEmail())) {
+                throw new IllegalArgumentException("Email já existe!");
+            }
             membro.setEmail(dto.getEmail());
         }
 

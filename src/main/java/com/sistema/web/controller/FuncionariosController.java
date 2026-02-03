@@ -5,6 +5,7 @@ import com.sistema.infrastructure.exceptions.InvalidTokenException;
 import com.sistema.web.dto.AuthResponseDTO;
 import com.sistema.web.dto.CredentialsDTO;
 import com.sistema.web.dto.RefreshTokenRequestDTO;
+import com.sistema.web.dto.Funcionarios.ChangePasswordDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioCreateDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioResponseDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioUpdateDTO;
@@ -50,6 +51,12 @@ public class FuncionariosController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFuncionario(@PathVariable Long id) {
         funcionariosServices.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/change-password")
+    public ResponseEntity<Void> changePassword(@PathVariable Long id, @RequestBody ChangePasswordDTO dto) {
+        funcionariosServices.changePassword(id, dto);
         return ResponseEntity.noContent().build();
     }
 

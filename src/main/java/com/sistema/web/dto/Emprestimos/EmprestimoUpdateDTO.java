@@ -15,4 +15,5 @@ public class EmprestimoUpdateDTO {
     private LocalDateTime dataEmprestimo;
     private LocalDateTime dataDevolucao;
     private Boolean status;
+    private Integer quantidade;
 }

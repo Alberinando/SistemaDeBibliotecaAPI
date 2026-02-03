@@ -8,6 +8,7 @@ import com.sistema.infrastructure.exceptions.DuplicatedTupleException;
 import com.sistema.infrastructure.exceptions.NotFoundException;
 import com.sistema.infrastructure.security.Jwt.Jwt;
 import com.sistema.web.dto.AuthResponseDTO;
+import com.sistema.web.dto.Funcionarios.ChangePasswordDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioCreateDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioResponseDTO;
 import com.sistema.web.dto.Funcionarios.FuncionarioUpdateDTO;
@@ -16,8 +17,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ public class FuncionariosServices {
                     dto.setNome(funcionario.getNome());
                     dto.setCargo(funcionario.getCargo());
                     dto.setLogin(funcionario.getLogin());
+                    dto.setNotificacaoAutomatica(funcionario.getNotificacaoAutomatica());
                     return dto;
                 });
     }
@@ -62,8 +66,29 @@ public class FuncionariosServices {
         funcionario.setCargo(dto.getCargo());
         funcionario.setLogin(dto.getLogin());
 
+        if (dto.getNotificacaoAutomatica() != null) {
+            funcionario.setNotificacaoAutomatica(dto.getNotificacaoAutomatica());
+        }
+
         var updatedFuncionario = funcionariosRepository.save(funcionario);
         return FuncionarioResponseDTO.converter(updatedFuncionario);
+    }
+
+    @Transactional
+    public void changePassword(Long id, ChangePasswordDTO dto) {
+        var funcionario = funcionariosRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Funcionário não encontrado"));
+
+        // Valida senha atual
+        if (!passwordEncoder.matches(dto.getSenhaAtual(), funcionario.getSenha())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha atual incorreta");
+        }
+
+        // Atualiza para nova senha
+        funcionario.setSenha(passwordEncoder.encode(dto.getNovaSenha()));
+        funcionariosRepository.save(funcionario);
+
+        log.info("Senha alterada com sucesso para funcionário ID: {}", id);
     }
 
     @Transactional

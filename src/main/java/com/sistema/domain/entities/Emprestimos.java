@@ -34,6 +34,9 @@ public class Emprestimos {
     @Column(nullable = false, length = 20)
     private Boolean status;
 
+    @Column(nullable = false)
+    private Integer quantidade = 1;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
