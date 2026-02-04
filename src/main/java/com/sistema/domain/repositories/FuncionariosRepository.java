@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FuncionariosRepository extends JpaRepository<Funcionarios, Long> {
     Funcionarios findByLogin(String login);
+
+    org.springframework.data.domain.Page<Funcionarios> findByIdNot(Long id,
+            org.springframework.data.domain.Pageable pageable);
 }

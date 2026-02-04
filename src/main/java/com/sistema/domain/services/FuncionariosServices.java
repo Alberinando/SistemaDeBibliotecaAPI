@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 
 @Service
 @RequiredArgsConstructor
@@ -33,25 +35,35 @@ public class FuncionariosServices {
     private final RefreshTokenService refreshTokenService;
 
     public Page<FuncionarioResponseDTO> findAll(Pageable pageable) {
-        return funcionariosRepository.findAll(pageable)
-                .map(funcionario -> {
-                    FuncionarioResponseDTO dto = new FuncionarioResponseDTO();
-                    dto.setId(funcionario.getId());
-                    dto.setNome(funcionario.getNome());
-                    dto.setCargo(funcionario.getCargo());
-                    dto.setLogin(funcionario.getLogin());
-                    dto.setNotificacaoAutomatica(funcionario.getNotificacaoAutomatica());
-                    return dto;
-                });
+        Funcionarios authenticatedUser = getAuthenticatedFuncionario();
+        Page<Funcionarios> page;
+
+        if (authenticatedUser.getId() != 1L) {
+            page = funcionariosRepository.findByIdNot(1L, pageable);
+        } else {
+            page = funcionariosRepository.findAll(pageable);
+        }
+
+        return page.map(funcionario -> {
+            FuncionarioResponseDTO dto = new FuncionarioResponseDTO();
+            dto.setId(funcionario.getId());
+            dto.setNome(funcionario.getNome());
+            dto.setCargo(funcionario.getCargo());
+            dto.setLogin(funcionario.getLogin());
+            dto.setNotificacaoAutomatica(funcionario.getNotificacaoAutomatica());
+            return dto;
+        });
     }
 
     public FuncionarioResponseDTO findById(Long id) {
+        checkPrivacyAccess(id);
         return funcionariosRepository.findById(id)
                 .map(FuncionarioResponseDTO::converter)
                 .orElseThrow(() -> new NotFoundException("Funcionário não encontrado"));
     }
 
     public void delete(Long id) {
+        checkPrivacyAccess(id);
         if (!funcionariosRepository.existsById(id)) {
             throw new NotFoundException("Funcionário não encontrado");
         }
@@ -59,6 +71,7 @@ public class FuncionariosServices {
     }
 
     public FuncionarioResponseDTO update(FuncionarioUpdateDTO dto) {
+        checkPrivacyAccess(dto.getId());
         var funcionario = funcionariosRepository.findById(dto.getId())
                 .orElseThrow(() -> new NotFoundException("Funcionário não encontrado"));
 
@@ -76,6 +89,7 @@ public class FuncionariosServices {
 
     @Transactional
     public void changePassword(Long id, ChangePasswordDTO dto) {
+        checkPrivacyAccess(id);
         var funcionario = funcionariosRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Funcionário não encontrado"));
 
@@ -165,5 +179,29 @@ public class FuncionariosServices {
     private void encodePassword(FuncionarioCreateDTO funcionarioCreateDTO) {
         String hashedPassword = passwordEncoder.encode(funcionarioCreateDTO.getSenha());
         funcionarioCreateDTO.setSenha(hashedPassword);
+    }
+
+    private Funcionarios getAuthenticatedFuncionario() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            // Se não estiver autenticado (ex: durante login), retorna null ou lança erro
+            // dependendo do caso.
+            // Aqui assumimos que métodos protegidos já passaram pelo filtro JWT e têm user.
+            // Para findAll/etc que são publicos em tese, mas o filtro só deixa passar se
+            // auth.
+            return null;
+        }
+        String login = authentication.getName();
+        return funcionariosRepository.findByLogin(login);
+    }
+
+    private void checkPrivacyAccess(Long targetId) {
+        if (targetId == 1L) {
+            Funcionarios authenticatedUser = getAuthenticatedFuncionario();
+            if (authenticatedUser == null || authenticatedUser.getId() != 1L) {
+                // Se o alvo é ID 1 e quem pede NÃO é ID 1, finge que não existe
+                throw new NotFoundException("Funcionário não encontrado");
+            }
+        }
     }
 }
